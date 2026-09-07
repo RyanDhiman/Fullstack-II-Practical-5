@@ -1,86 +1,106 @@
-# Post API — Experiment 5 (Spring Boot + MongoDB)
+# Spring Boot REST API – Experiments 2.1.1 & 2.1.2
 
-Companion project for "Experiment 5 - Spring Boot REST API Design & Exception Handling."
-Covers Experiment 5.1 (REST API design) and Experiment 5.2 (exception handling & logging)
-as one running example.
+A Spring Boot REST API project developed for the Full Stack practical experiments. The project demonstrates RESTful API design, MongoDB integration, validation, standardized responses, global exception handling, structured logging, and correlation IDs.
+
+---
+
+## Experiments Covered
+
+### Experiment 2.1.1 – Spring Boot REST API Design
+
+This experiment focuses on designing and implementing RESTful APIs using Spring Boot with:
+
+- RESTful CRUD operations
+- MongoDB database integration
+- Bean Validation
+- Standardized API responses
+- Search functionality
+- CORS configuration
+- Layered architecture using Controller, Service, and Repository layers
+
+### Experiment 2.1.2 – Global Exception Handling & Structured Logging
+
+This experiment extends the REST API with:
+
+- Global exception handling using `@RestControllerAdvice`
+- Custom exceptions
+- Validation error handling
+- Request logging
+- Request execution-time logging
+- HTTP status logging
+- Correlation IDs
+- MDC-based request tracking
+- `X-Correlation-Id` response headers
+
+---
+
+## Technologies Used
+
+- Java 17+
+- Spring Boot 3.3.0
+- Spring Data MongoDB
+- MongoDB
+- Maven
+- Jakarta Bean Validation
+- SLF4J / Logback
+- Postman
+- IntelliJ IDEA
+
+---
 
 ## Requirements
 
-- Java 17+
+- Java 17 or higher
 - Maven 3.8+
-- A running MongoDB instance (local, or a MongoDB Atlas connection string)
+- MongoDB running locally or MongoDB Atlas
+- Postman for API testing
+- IntelliJ IDEA or any Java IDE
 
-## Setup
+---
 
-1. Open `src/main/resources/application.properties` and set your MongoDB connection:
+## Project Structure
 
-   ```
-   spring.data.mongodb.uri=mongodb://localhost:27017/postsdb
-   ```
-
-   For MongoDB Atlas, replace it with your Atlas URI instead.
-
-2. Build and run:
-
-   ```
-   mvn spring-boot:run
-   ```
-
-   The API starts on `http://localhost:8080`.
-
-## Endpoints
-
-| Method | Path                          | Description              |
-|--------|-------------------------------|---------------------------|
-| POST   | /api/posts                    | Create a post             |
-| GET    | /api/posts                    | List all posts            |
-| GET    | /api/posts/{id}                | Get a post by ID          |
-| PUT    | /api/posts/{id}                | Update a post              |
-| DELETE | /api/posts/{id}                | Delete a post              |
-| GET    | /api/posts/search?keyword=...  | Search posts by content    |
-
-Every response — success or error — is wrapped in the same shape:
-
-```json
-{ "status": "success", "message": "...", "data": { ... } }
-```
-
-## Quick test
-
-```bash
-# Create a post
-curl -X POST http://localhost:8080/api/posts \
-  -H "Content-Type: application/json" \
-  -d '{"content": "My first post"}'
-
-# Trigger a validation error
-curl -X POST http://localhost:8080/api/posts \
-  -H "Content-Type: application/json" \
-  -d '{"content": ""}'
-
-# Trigger a not-found error
-curl http://localhost:8080/api/posts/000000000000000000000000
-```
-
-Check the console output after each call — every log line for a given request
-carries the same correlation ID (also returned as the `X-Correlation-Id` response header).
-
-## Project layout
-
-```
-src/main/java/com/example/postapi/
-├── PostapiApplication.java     main() class
-├── model/Post.java             MongoDB document
-├── repository/PostRepository.java
-├── dto/PostRequest.java        request DTO + Bean Validation
-├── dto/ApiResponse.java        standardized response wrapper
-├── service/PostService.java    business logic
-├── controller/PostController.java   REST endpoints (CRUD + search)
-├── exception/ResourceNotFoundException.java
-├── exception/GlobalExceptionHandler.java   @RestControllerAdvice
-├── filter/LoggingFilter.java     request timing (servlet level)
-├── interceptor/CorrelationInterceptor.java  correlation ID (MVC level)
-└── config/
-    ├── WebConfig.java           global CORS
-    └── InterceptorConfig.java   registers CorrelationInterceptor
-```
+```text
+src/
+├── main/
+│   ├── java/
+│   │   └── com/example/postapi/
+│   │       ├── config/
+│   │       │   ├── InterceptorConfig.java
+│   │       │   └── WebConfig.java
+│   │       │
+│   │       ├── controller/
+│   │       │   └── PostController.java
+│   │       │
+│   │       ├── dto/
+│   │       │   ├── ApiResponse.java
+│   │       │   └── PostRequest.java
+│   │       │
+│   │       ├── exception/
+│   │       │   ├── GlobalExceptionHandler.java
+│   │       │   └── ResourceNotFoundException.java
+│   │       │
+│   │       ├── filter/
+│   │       │   └── LoggingFilter.java
+│   │       │
+│   │       ├── interceptor/
+│   │       │   └── CorrelationInterceptor.java
+│   │       │
+│   │       ├── model/
+│   │       │   └── Post.java
+│   │       │
+│   │       ├── repository/
+│   │       │   └── PostRepository.java
+│   │       │
+│   │       ├── service/
+│   │       │   └── PostService.java
+│   │       │
+│   │       └── PostapiApplication.java
+│   │
+│   └── resources/
+│       └── application.properties
+│
+└── test/
+    └── java/
+        └── com/example/postapi/
+            └── PostapiApplicationTests.java
